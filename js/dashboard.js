@@ -142,7 +142,8 @@ function initCharts() {
         },
         options: {
             responsive: true,
-            maintainAspectRatio: false,
+            maintainAspectRatio: true, // Mudar para true
+            height: 300, // Definir altura fixa
             scales: {
                 y: {
                     beginAtZero: true,
