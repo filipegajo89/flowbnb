@@ -1,0 +1,63 @@
+:root {
+    --primary-color: #00AB67; /* Verde da logo */
+    --secondary-color: #0C3C60; /* Azul marinho da logo */
+    --light-bg: #f8f9fa;
+    --dark-text: #343a40;
+    --red-expenses: #ff6b6b;
+    --green-income: #51cf66;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: var(--light-bg);
+    color: var(--dark-text);
+}
+
+.logo {
+    max-width: 250px;
+    height: auto;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+    background-color: #009159;
+    border-color: #009159;
+}
+
+.btn-secondary {
+    background-color: var(--secondary-color);
+    border-color: var(--secondary-color);
+}
+
+.btn-secondary:hover {
+    background-color: #0a2e4a;
+    border-color: #0a2e4a;
+}
+
+.card {
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.text-income {
+    color: var(--green-income);
+}
+
+.text-expense {
+    color: var(--red-expenses);
+}
+
+/* Estilos para o Dashboard */
+.sidebar {
+    background-color: var(--secondary-color);
+    color: white;
+    min-height: 100vh;
+}
+
+.main-content {
+    padding: 20px;
+}
