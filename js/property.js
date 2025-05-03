@@ -335,3 +335,290 @@ function showReports() {
 function formatCurrency(value) {
     return value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
+
+// Função para editar uma transação
+function editTransaction(period) {
+    const propertyId = new URLSearchParams(window.location.search).get('id') || 'property1';
+    const allProperties = JSON.parse(localStorage.getItem('propertiesData')) || {};
+    const property = allProperties[propertyId];
+    
+    if (!property || !property.transactions) {
+        alert('Dados não encontrados.');
+        return;
+    }
+    
+    // Encontra a transação pelo período
+    const transaction = property.transactions.find(t => t.period === period);
+    if (!transaction) {
+        alert('Transação não encontrada.');
+        return;
+    }
+    
+    // Preenche o formulário do modal com os dados da transação
+    document.getElementById('transactionPeriod').value = periodToInputFormat(period);
+    document.getElementById('incomeAirbnb').value = transaction.airbnb;
+    document.getElementById('incomeBooking').value = transaction.booking;
+    document.getElementById('incomeDirect').value = transaction.direct;
+    document.getElementById('expenseCondominium').value = transaction.condominium;
+    document.getElementById('expenseIptu').value = transaction.iptu;
+    document.getElementById('expenseElectricity').value = transaction.electricity;
+    document.getElementById('expenseInternet').value = transaction.internet;
+    document.getElementById('expensePlatforms').value = transaction.platforms;
+    
+    // Armazena o período original para uso na função de salvar
+    window.editingPeriod = period;
+    
+    // Abre o modal
+    const modal = new bootstrap.Modal(document.getElementById('addTransactionModal'));
+    modal.show();
+}
+
+// Função para deletar uma transação
+function deleteTransaction(period) {
+    const confirmDelete = confirm(`Tem certeza que deseja excluir a transação do período ${period}?`);
+    
+    if (!confirmDelete) return;
+    
+    const propertyId = new URLSearchParams(window.location.search).get('id') || 'property1';
+    const allProperties = JSON.parse(localStorage.getItem('propertiesData')) || {};
+    
+    if (!allProperties[propertyId] || !allProperties[propertyId].transactions) {
+        alert('Dados não encontrados.');
+        return;
+    }
+    
+    // Remove a transação
+    allProperties[propertyId].transactions = allProperties[propertyId].transactions.filter(
+        t => t.period !== period
+    );
+    
+    // Atualiza métricas
+    updatePropertyMetrics(allProperties[propertyId]);
+    
+    // Salva no localStorage
+    localStorage.setItem('propertiesData', JSON.stringify(allProperties));
+    
+    // Atualiza dados do dashboard
+    updateDashboardData(allProperties);
+    
+    // Recarrega a página
+    loadPropertyData(propertyId);
+    
+    alert('Transação excluída com sucesso!');
+}
+
+// Função para salvar uma transação (nova ou editada)
+function saveTransaction() {
+    const propertyId = new URLSearchParams(window.location.search).get('id') || 'property1';
+    const periodInput = document.getElementById('transactionPeriod').value;
+    
+    // Validação básica
+    if (!periodInput) {
+        alert('Por favor, informe o período.');
+        return;
+    }
+    
+    // Converte o período para o formato MM/YYYY
+    const period = inputFormatToPeriod(periodInput);
+    
+    // Coleta os valores do formulário
+    const transaction = {
+        period,
+        airbnb: parseFloat(document.getElementById('incomeAirbnb').value) || 0,
+        booking: parseFloat(document.getElementById('incomeBooking').value) || 0,
+        direct: parseFloat(document.getElementById('incomeDirect').value) || 0,
+        condominium: parseFloat(document.getElementById('expenseCondominium').value) || 0,
+        iptu: parseFloat(document.getElementById('expenseIptu').value) || 0,
+        electricity: parseFloat(document.getElementById('expenseElectricity').value) || 0,
+        internet: parseFloat(document.getElementById('expenseInternet').value) || 0,
+        platforms: parseFloat(document.getElementById('expensePlatforms').value) || 0
+    };
+    
+    // Calcula totais
+    transaction.totalIncome = transaction.airbnb + transaction.booking + transaction.direct;
+    transaction.totalExpenses = transaction.condominium + transaction.iptu + 
+                               transaction.electricity + transaction.internet + 
+                               transaction.platforms;
+    transaction.result = transaction.totalIncome - transaction.totalExpenses;
+    
+    // Obtém dados existentes ou inicializa
+    const allProperties = JSON.parse(localStorage.getItem('propertiesData')) || {};
+    
+    if (!allProperties[propertyId]) {
+        allProperties[propertyId] = {
+            transactions: []
+        };
+    }
+    
+    // Verifica se é uma edição ou uma nova transação
+    const editingPeriod = window.editingPeriod;
+    if (editingPeriod) {
+        // Remove a transação antiga
+        allProperties[propertyId].transactions = allProperties[propertyId].transactions.filter(
+            t => t.period !== editingPeriod
+        );
+        
+        // Limpa a variável de edição
+        window.editingPeriod = null;
+    }
+    
+    // Verifica se já existe uma transação para este período
+    const existingIndex = allProperties[propertyId].transactions.findIndex(
+        t => t.period === period
+    );
+    
+    if (existingIndex >= 0) {
+        // Atualiza a transação existente
+        allProperties[propertyId].transactions[existingIndex] = transaction;
+    } else {
+        // Adiciona nova transação
+        allProperties[propertyId].transactions.push(transaction);
+    }
+    
+    // Ordena as transações por período (mais recente primeiro)
+    allProperties[propertyId].transactions.sort((a, b) => {
+        // Converte período para um formato comparável (assume MM/YYYY)
+        const periodToDate = (period) => {
+            const [month, year] = period.split('/');
+            return new Date(parseInt(year), parseInt(month) - 1);
+        };
+        
+        const dateA = periodToDate(a.period);
+        const dateB = periodToDate(b.period);
+        
+        return dateB - dateA;
+    });
+    
+    // Atualiza métricas da propriedade
+    updatePropertyMetrics(allProperties[propertyId]);
+    
+    // Salva no localStorage
+    localStorage.setItem('propertiesData', JSON.stringify(allProperties));
+    
+    // Atualiza dados do dashboard
+    updateDashboardData(allProperties);
+    
+    // Reseta o formulário
+    document.getElementById('transactionForm').reset();
+    
+    // Fecha o modal
+    const modal = bootstrap.Modal.getInstance(document.getElementById('addTransactionModal'));
+    modal.hide();
+    
+    // Recarrega os dados da propriedade
+    loadPropertyData(propertyId);
+    
+    alert('Transação salva com sucesso!');
+}
+
+// Função auxiliar para converter período MM/YYYY para formato de input (YYYY-MM)
+function periodToInputFormat(period) {
+    if (!period) return '';
+    
+    const parts = period.split('/');
+    if (parts.length !== 2) return period;
+    
+    return `${parts[1]}-${parts[0]}`;
+}
+
+// Função auxiliar para converter formato de input (YYYY-MM) para período MM/YYYY
+function inputFormatToPeriod(inputFormat) {
+    if (!inputFormat) return '';
+    
+    const parts = inputFormat.split('-');
+    if (parts.length !== 2) return inputFormat;
+    
+    return `${parts[1]}/${parts[0]}`;
+}
+
+// Função para calcular métricas da propriedade
+function updatePropertyMetrics(property) {
+    // Calcula métricas baseadas nas transações
+    const transactions = property.transactions;
+    
+    if (!transactions || transactions.length === 0) return;
+    
+    // Últimos 12 meses
+    const last12Months = transactions.slice(0, 12);
+    
+    // Métricas
+    const totalIncome = last12Months.reduce((sum, t) => sum + t.totalIncome, 0);
+    const totalExpenses = last12Months.reduce((sum, t) => sum + t.totalExpenses, 0);
+    const result = totalIncome - totalExpenses;
+    const profitability = totalIncome > 0 ? (result / totalIncome) * 100 : 0;
+    
+    // Armazena as métricas
+    property.metrics = {
+        totalIncome,
+        totalExpenses,
+        result,
+        profitability
+    };
+}
+
+// Função para atualizar os dados do dashboard
+function updateDashboardData(allProperties) {
+    // Extrai todas as transações de todas as propriedades
+    const allTransactions = [];
+    Object.values(allProperties).forEach(property => {
+        if (property.transactions) {
+            allTransactions.push(...property.transactions);
+        }
+    });
+    
+    // Agrupa transações por período
+    const transactionsByPeriod = {};
+    allTransactions.forEach(transaction => {
+        if (!transactionsByPeriod[transaction.period]) {
+            transactionsByPeriod[transaction.period] = {
+                income: 0,
+                expenses: 0,
+                result: 0
+            };
+        }
+        
+        transactionsByPeriod[transaction.period].income += transaction.totalIncome;
+        transactionsByPeriod[transaction.period].expenses += transaction.totalExpenses;
+        transactionsByPeriod[transaction.period].result += transaction.result;
+    });
+    
+    // Converte para array e ordena por período
+    const periodData = Object.entries(transactionsByPeriod).map(([period, data]) => ({
+        period,
+        ...data
+    })).sort((a, b) => {
+        // Converte período para um formato comparável (assume MM/YYYY)
+        const periodToDate = (period) => {
+            const [month, year] = period.split('/');
+            return new Date(parseInt(year), parseInt(month) - 1);
+        };
+        
+        const dateA = periodToDate(a.period);
+        const dateB = periodToDate(b.period);
+        
+        return dateA - dateB; // Ordem cronológica para o gráfico
+    });
+    
+    // Calcula totais gerais para o dashboard
+    const dashboardTotals = {
+        totalIncome: Object.values(allProperties).reduce((sum, p) => sum + (p.metrics?.totalIncome || 0), 0),
+        totalExpenses: Object.values(allProperties).reduce((sum, p) => sum + (p.metrics?.totalExpenses || 0), 0),
+        totalResult: Object.values(allProperties).reduce((sum, p) => sum + (p.metrics?.result || 0), 0)
+    };
+    
+    // Calcula distribuição de receitas
+    const incomeDistribution = {
+        airbnb: allTransactions.reduce((sum, t) => sum + t.airbnb, 0),
+        booking: allTransactions.reduce((sum, t) => sum + t.booking, 0),
+        direct: allTransactions.reduce((sum, t) => sum + t.direct, 0)
+    };
+    
+    // Salva dados do dashboard
+    const dashboardData = {
+        totals: dashboardTotals,
+        periodData,
+        incomeDistribution
+    };
+    
+    localStorage.setItem('dashboardData', JSON.stringify(dashboardData));
+}
