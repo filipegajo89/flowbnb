@@ -55,24 +55,39 @@ body {
 .sidebar {
     background-color: white;
     color: var(--secondary-color);
-    min-height: 100vh;
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    z-index: 100;
     border-right: 1px solid #e9ecef;
+    padding-top: 0.5rem;
 }
 
-/* E alterar os links da navegação */
-.sidebar .nav-link {
+/* Ajuste para o logo em todas as páginas */
+.logo-small {
+    max-width: 150px;
+    height: auto;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+/* Estilos de navegação consistentes */
+.nav-link {
     color: var(--secondary-color);
+    border-radius: 0.5rem;
+    margin-bottom: 0.25rem;
     opacity: 0.8;
 }
 
-.sidebar .nav-link:hover {
+.nav-link:hover {
+    background-color: rgba(0, 171, 103, 0.1);
     color: var(--secondary-color);
     opacity: 1;
 }
 
-.sidebar .nav-link.active {
+.nav-link.active {
     background-color: var(--primary-color) !important;
-    color: white;
+    color: white !important;
     opacity: 1;
 }
 
