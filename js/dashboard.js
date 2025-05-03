@@ -1,6 +1,9 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Atualiza o nome do usuário na sidebar
     updateUserInfo();
+
+     // Atualiza o menu lateral com as propriedades
+    updateSidebarMenu();
     
     // Carrega os dados de exemplo
     loadSampleData();
