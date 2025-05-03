@@ -61,6 +61,21 @@ body {
     z-index: 100;
     border-right: 1px solid #e9ecef;
     padding-top: 0.5rem;
+    overflow-y: auto; /* Adicionar scroll quando necessário */
+}
+
+/* Ajustar espaçamento do menu */
+.nav-pills {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+/* Garantir que todos os itens do menu sejam visíveis */
+.nav-pills li {
+    width: 100%;
+    margin-bottom: 0.25rem;
+    display: block; /* Garantir que os itens sejam sempre exibidos */
 }
 
 /* Ajuste para o logo em todas as páginas */
@@ -75,8 +90,13 @@ body {
 .nav-link {
     color: var(--secondary-color);
     border-radius: 0.5rem;
+    padding: 0.5rem 1rem;
     margin-bottom: 0.25rem;
     opacity: 0.8;
+    display: flex; /* Para alinhar o ícone e o texto */
+    align-items: center;
+    width: 100%;
+    transition: all 0.2s ease;
 }
 
 .nav-link:hover {
@@ -89,6 +109,44 @@ body {
     background-color: var(--primary-color) !important;
     color: white !important;
     opacity: 1;
+    font-weight: 500;
+}
+
+/* Ajustar ícones do menu */
+.nav-link i {
+    margin-right: 0.75rem;
+    font-size: 1.1rem;
+}
+
+/* Adicionar indicador visual para facilitar navegação */
+.nav-link.active::before {
+    content: "";
+    width: 4px;
+    height: 100%;
+    background-color: var(--primary-color);
+    position: absolute;
+    left: 0;
+    top: 0;
+    border-radius: 0 2px 2px 0;
+}
+
+/* Estilizar os grupos de itens */
+.sidebar-heading {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 0.5rem 1rem;
+    color: #6c757d;
+    font-weight: 600;
+    margin-top: 1rem;
+}
+
+/* Ajustes para dispositivos móveis */
+@media (max-width: 767.98px) {
+    .sidebar {
+        height: auto;
+        position: relative;
+    }
 }
 
 /* Ajustar dropdown do usuário */
