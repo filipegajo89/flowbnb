@@ -51,3 +51,75 @@ canvas {
         margin-bottom: 1rem;
     }
 }
+
+/* Estilos específicos para a página de dashboard */
+
+/* Garantir que os ícones do menu sejam bem visíveis */
+.nav-link i {
+    margin-right: 0.75rem;
+    font-size: 1.1rem;
+}
+
+/* Melhorar o espaçamento dos itens do menu */
+.nav-pills .nav-link {
+    padding: 0.6rem 1rem;
+    margin-bottom: 0.4rem;
+    display: flex;
+    align-items: center;
+}
+
+/* Ajustar altura e comportamento do menu */
+.sidebar {
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    overflow-y: auto;
+}
+
+/* Adicionar um estilo especial para o item ativo */
+.nav-link.active {
+    background-color: var(--primary-color) !important;
+    color: white !important;
+    font-weight: 500;
+}
+
+/* Melhorar o estilo do contêiner de propriedades */
+#propertyLinks {
+    width: 100%;
+    margin-bottom: 0.5rem;
+}
+
+/* Estilizar o avatar do usuário */
+.dropdown-toggle .bi-person-circle {
+    font-size: 1.2rem;
+}
+
+/* Adicionar melhor estilo para os cards */
+.card {
+    border-radius: 0.75rem;
+    border: none;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.card-title {
+    color: var(--secondary-color);
+    font-weight: 600;
+}
+
+/* Manter os gráficos com altura fixa */
+canvas {
+    min-height: 250px;
+    max-height: 350px;
+}
+
+/* Ajustes para telas menores */
+@media (max-width: 767.98px) {
+    .sidebar {
+        height: auto;
+        position: relative;
+    }
+    
+    .card {
+        margin-bottom: 1rem;
+    }
+}
