@@ -227,3 +227,121 @@ window.addEventListener('storage', function(e) {
 document.addEventListener('DOMContentLoaded', function() {
     updateSidebarMenu();
 });
+
+// Função para atualizar o menu lateral com as propriedades
+function updateSidebarMenu() {
+    // Verifica se o elemento do menu existe
+    const propertyLinks = document.getElementById('propertyLinks');
+    if (!propertyLinks) return;
+    
+    // Obtém as propriedades do localStorage
+    const propertiesRegistry = JSON.parse(localStorage.getItem('propertiesRegistry')) || {};
+    
+    // Limpa os links existentes
+    propertyLinks.innerHTML = '';
+    
+    // Obtém o ID da propriedade atual da URL (se estiver na página de propriedade)
+    let currentPropertyId = '';
+    if (window.location.pathname.includes('property.html')) {
+        const urlParams = new URLSearchParams(window.location.search);
+        currentPropertyId = urlParams.get('id') || '';
+    }
+    
+    // Se não houver propriedades cadastradas, adiciona as padrões
+    if (Object.keys(propertiesRegistry).length === 0) {
+        // Propriedades padrão
+        const defaultProperties = {
+            'property1': { name: 'Apartamento 1' },
+            'property2': { name: 'Apartamento 2' },
+            'property3': { name: 'Apartamento 3' }
+        };
+        
+        // Para cada propriedade padrão
+        Object.entries(defaultProperties).forEach(([id, property]) => {
+            const listItem = document.createElement('li');
+            
+            // Verifica se esta é a propriedade atual para adicionar a classe active
+            const isActive = id === currentPropertyId;
+            
+            listItem.innerHTML = `
+                <a href="${getProperPath()}property.html?id=${id}" class="nav-link ${isActive ? 'active' : ''}">
+                    <i class="bi bi-house"></i>
+                    ${property.name}
+                </a>
+            `;
+            
+            propertyLinks.appendChild(listItem);
+        });
+    } else {
+        // Adiciona as propriedades cadastradas
+        Object.entries(propertiesRegistry).forEach(([id, property]) => {
+            const listItem = document.createElement('li');
+            
+            // Verifica se esta é a propriedade atual para adicionar a classe active
+            const isActive = id === currentPropertyId;
+            
+            listItem.innerHTML = `
+                <a href="${getProperPath()}property.html?id=${id}" class="nav-link ${isActive ? 'active' : ''}">
+                    <i class="bi bi-house"></i>
+                    ${property.name}
+                </a>
+            `;
+            
+            propertyLinks.appendChild(listItem);
+        });
+    }
+    
+    // Também destaca o item de menu atual com base na página
+    highlightCurrentPage();
+}
+
+// Função para obter o caminho correto (para links relativos)
+function getProperPath() {
+    // Verifica se estamos na raiz ou em uma subpasta
+    if (window.location.pathname.includes('/pages/')) {
+        return '';
+    } else {
+        return 'pages/';
+    }
+}
+
+// Função para destacar a página atual no menu
+function highlightCurrentPage() {
+    // Remove a classe active de todos os links
+    document.querySelectorAll('.nav-link').forEach(link => {
+        // Não remova de links de propriedades que já estão destacados
+        if (!link.closest('#propertyLinks')) {
+            link.classList.remove('active');
+        }
+    });
+    
+    // Obtém o nome da página atual
+    const currentPage = window.location.pathname.split('/').pop();
+    
+    // Destaca o link correspondente à página atual
+    if (currentPage === '' || currentPage === 'index.html' || currentPage === 'dashboard.html') {
+        const dashboardLink = document.querySelector('a[href*="dashboard.html"]');
+        if (dashboardLink) dashboardLink.classList.add('active');
+    } else if (currentPage === 'reports.html') {
+        const reportsLink = document.querySelector('a[href*="reports.html"]');
+        if (reportsLink) reportsLink.classList.add('active');
+    } else if (currentPage === 'import.html') {
+        const importLink = document.querySelector('a[href*="import.html"]');
+        if (importLink) importLink.classList.add('active');
+    } else if (currentPage === 'properties.html') {
+        const propertiesLink = document.querySelector('a[href*="properties.html"]');
+        if (propertiesLink) propertiesLink.classList.add('active');
+    }
+}
+
+// Chama a função quando a página carregar
+document.addEventListener('DOMContentLoaded', function() {
+    updateSidebarMenu();
+});
+
+// Monitora alterações no localStorage para atualizar o menu
+window.addEventListener('storage', function(e) {
+    if (e.key === 'sidebarUpdateTimestamp' || e.key === 'propertiesRegistry') {
+        updateSidebarMenu();
+    }
+});
