@@ -1,0 +1,57 @@
+/* Melhorias visuais para a página de importação */
+.form-select, .form-control {
+    border-radius: 0.5rem;
+}
+
+.card {
+    border-radius: 0.75rem;
+    border: none;
+}
+
+.card-title {
+    color: var(--secondary-color);
+    font-weight: 600;
+}
+
+.btn-primary, .btn-success {
+    border-radius: 0.5rem;
+    padding: 0.5rem 1.5rem;
+}
+
+.table-light th {
+    background-color: #f8f9fa;
+    color: var(--secondary-color);
+}
+
+/* Melhorias para a visualização de dados */
+#previewTable {
+    font-size: 0.875rem;
+}
+
+#previewTable th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(0, 171, 103, 0.1);
+}
+
+/* Melhoria visual para input de arquivo */
+input[type="file"] {
+    padding: 0.75rem;
+    line-height: 1.5;
+}
+
+.input-group-lg > .form-control {
+    font-size: 1rem;
+}
+
+/* Ajuste para telas menores */
+@media (max-width: 767.98px) {
+    .btn-lg {
+        padding: 0.5rem 1rem;
+        font-size: 1rem;
+    }
+}
