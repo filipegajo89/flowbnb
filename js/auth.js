@@ -164,3 +164,66 @@ function handleLogin(event) {
         alert('E-mail ou senha incorretos!');
     }
 }
+
+// Adicionar este código ao final do arquivo js/auth.js
+
+// Função para atualizar o menu lateral com as propriedades
+function updateSidebarMenu() {
+    // Verifica se o elemento do menu existe
+    const propertyLinks = document.getElementById('propertyLinks');
+    if (!propertyLinks) return;
+    
+    // Obtém as propriedades do localStorage
+    const propertiesRegistry = JSON.parse(localStorage.getItem('propertiesRegistry')) || {};
+    
+    // Limpa os links existentes
+    propertyLinks.innerHTML = '';
+    
+    // Se não houver propriedades cadastradas, adiciona as padrões
+    if (Object.keys(propertiesRegistry).length === 0) {
+        // Propriedades padrão
+        const defaultProperties = {
+            'property1': { name: 'Apartamento 1' },
+            'property2': { name: 'Apartamento 2' },
+            'property3': { name: 'Apartamento 3' }
+        };
+        
+        // Para cada propriedade padrão
+        Object.entries(defaultProperties).forEach(([id, property]) => {
+            const listItem = document.createElement('li');
+            listItem.innerHTML = `
+                <a href="property.html?id=${id}" class="nav-link">
+                    <i class="bi bi-house me-2"></i>
+                    ${property.name}
+                </a>
+            `;
+            
+            propertyLinks.appendChild(listItem);
+        });
+    } else {
+        // Adiciona as propriedades cadastradas
+        Object.entries(propertiesRegistry).forEach(([id, property]) => {
+            const listItem = document.createElement('li');
+            listItem.innerHTML = `
+                <a href="property.html?id=${id}" class="nav-link">
+                    <i class="bi bi-house me-2"></i>
+                    ${property.name}
+                </a>
+            `;
+            
+            propertyLinks.appendChild(listItem);
+        });
+    }
+}
+
+// Monitora alterações no localStorage para atualizar o menu
+window.addEventListener('storage', function(e) {
+    if (e.key === 'sidebarUpdateTimestamp' || e.key === 'propertiesRegistry') {
+        updateSidebarMenu();
+    }
+});
+
+// Atualiza o menu lateral quando a página carregar
+document.addEventListener('DOMContentLoaded', function() {
+    updateSidebarMenu();
+});
