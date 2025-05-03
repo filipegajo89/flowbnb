@@ -20,31 +20,17 @@
                         <img src="../assets/img/logo.png" alt="FlowBnb Logo" class="logo-small">
                     </a>
                     <hr>
+                    <!-- Substituir em todas as páginas -->
                     <ul class="nav nav-pills flex-column mb-auto">
                         <li class="nav-item">
-                            <a href="#" class="nav-link active text-white" aria-current="page">
+                            <a href="dashboard.html" class="nav-link">
                                 <i class="bi bi-speedometer2 me-2"></i>
                                 Dashboard
                             </a>
                         </li>
-                        <li>
-                            <a href="#" class="nav-link" onclick="loadProperty('property1')">
-                                <i class="bi bi-house me-2"></i>
-                                Apartamento 1
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="nav-link" onclick="loadProperty('property2')">
-                                <i class="bi bi-house me-2"></i>
-                                Apartamento 2
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="nav-link" onclick="loadProperty('property3')">
-                                <i class="bi bi-house me-2"></i>
-                                Apartamento 3
-                            </a>
-                        </li>
+                        <div id="propertyLinks">
+                            <!-- Links de propriedades serão adicionados dinamicamente -->
+                        </div>
                         <li>
                             <a href="#" class="nav-link" onclick="showReports()">
                                 <i class="bi bi-file-earmark-bar-graph me-2"></i>
@@ -55,6 +41,12 @@
                             <a href="import.html" class="nav-link">
                                 <i class="bi bi-upload me-2"></i>
                                 Importar Dados
+                            </a>
+                        </li>
+                        <li>
+                            <a href="properties.html" class="nav-link">
+                                <i class="bi bi-houses me-2"></i>
+                                Gerenciar Propriedades
                             </a>
                         </li>
                     </ul>
