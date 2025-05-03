@@ -78,135 +78,87 @@ function checkUserPermissions() {
     }
 }
 
+// Modificar a função loadPropertyData no arquivo js/property.js
 function loadPropertyData(propertyId) {
-    // Dados de exemplo baseados nas suas planilhas
-    const samplePropertyData = {
-        property1: {
-            name: 'Apartamento 1',
-            summary: {
-                income: 15000,
-                expenses: 5000,
-                result: 10000,
-                profitability: 66.67
-            },
-            incomeBySource: {
-                airbnb: 9000,
-                booking: 4000,
-                direct: 2000
-            },
-            monthlyData: [
-                { month: 'Jan', income: 3000, expenses: 1000, result: 2000 },
-                { month: 'Feb', income: 3500, expenses: 1200, result: 2300 },
-                { month: 'Mar', income: 4000, expenses: 1400, result: 2600 },
-                { month: 'Apr', income: 4500, expenses: 1400, result: 3100 }
-            ],
-            transactions: [
-                {
-                    period: '04/2025',
-                    airbnb: 4500,
-                    booking: 0,
-                    direct: 0,
-                    condominium: 1000,
-                    iptu: 0,
-                    electricity: 150,
-                    internet: 100,
-                    platforms: 150,
-                    result: 3100
-                },
-                {
-                    period: '03/2025',
-                    airbnb: 4000,
-                    booking: 0,
-                    direct: 0,
-                    condominium: 1000,
-                    iptu: 0,
-                    electricity: 200,
-                    internet: 100,
-                    platforms: 100,
-                    result: 2600
-                },
-                {
-                    period: '02/2025',
-                    airbnb: 3500,
-                    booking: 0,
-                    direct: 0,
-                    condominium: 1000,
-                    iptu: 0,
-                    electricity: 120,
-                    internet: 80,
-                    platforms: 0,
-                    result: 2300
-                },
-                {
-                    period: '01/2025',
-                    airbnb: 3000,
-                    booking: 0,
-                    direct: 0,
-                    condominium: 1000,
-                    iptu: 0,
-                    electricity: 0,
-                    internet: 0,
-                    platforms: 0,
-                    result: 2000
-                }
-            ]
-        },
-        // Dados similares para outras propriedades...
-        property2: {
-            name: 'Apartamento 2',
-            summary: {
-                income: 12000,
-                expenses: 4500,
-                result: 7500,
-                profitability: 62.50
-            },
-            // Dados similares para property1...
-            transactions: [
-                {
-                    period: '04/2025',
-                    airbnb: 4000,
-                    booking: 0,
-                    direct: 0,
-                    condominium: 900,
-                    iptu: 0,
-                    electricity: 150,
-                    internet: 100,
-                    platforms: 150,
-                    result: 2700
-                },
-                // Mais transações...
-            ]
-        },
-        property3: {
-            name: 'Apartamento 3',
-            summary: {
-                income: 10000,
-                expenses: 3500,
-                result: 6500,
-                profitability: 65.00
-            },
-            // Dados similares para property1...
-            transactions: [
-                {
-                    period: '04/2025',
-                    airbnb: 3500,
-                    booking: 0,
-                    direct: 0,
-                    condominium: 800,
-                    iptu: 0,
-                    electricity: 120,
-                    internet: 100,
-                    platforms: 100,
-                    result: 2380
-                },
-                // Mais transações...
-            ]
-        }
+    // Tenta carregar dados do localStorage
+    const allProperties = JSON.parse(localStorage.getItem('propertiesData')) || {};
+    const propertyData = allProperties[propertyId];
+    
+    // Se não houver dados no localStorage, usa os dados de exemplo
+    if (!propertyData || !propertyData.transactions || propertyData.transactions.length === 0) {
+        // Use o código existente para carregar dados de exemplo
+        loadSamplePropertyData(propertyId);
+        return;
+    }
+    
+    // Calcula métricas para exibição
+    const transactions = propertyData.transactions;
+    
+    // Prepara dados para exibição
+    const monthlyData = transactions.slice(0, 12).map(t => ({
+        month: convertPeriodToMonthName(t.period),
+        income: t.totalIncome,
+        expenses: t.totalExpenses,
+        result: t.result
+    })).reverse(); // Inverte para ordem cronológica
+    
+    // Calcula distribuição de receitas
+    const incomeBySource = {
+        airbnb: transactions.reduce((sum, t) => sum + t.airbnb, 0),
+        booking: transactions.reduce((sum, t) => sum + t.booking, 0),
+        direct: transactions.reduce((sum, t) => sum + t.direct, 0)
     };
     
-    // Obtém os dados da propriedade selecionada
-    const propertyData = samplePropertyData[propertyId] || samplePropertyData.property1;
+    // Prepara objeto com todos os dados
+    const displayData = {
+        name: getPropertyName(propertyId),
+        summary: {
+            income: propertyData.metrics?.totalIncome || 0,
+            expenses: propertyData.metrics?.totalExpenses || 0,
+            result: propertyData.metrics?.result || 0,
+            profitability: propertyData.metrics?.profitability || 0
+        },
+        incomeBySource,
+        monthlyData,
+        transactions: transactions.map(t => ({
+            period: t.period,
+            airbnb: t.airbnb,
+            booking: t.booking,
+            direct: t.direct,
+            condominium: t.condominium,
+            iptu: t.iptu,
+            electricity: t.electricity,
+            internet: t.internet,
+            platforms: t.platforms,
+            result: t.result
+        }))
+    };
     
+    // Atualiza a interface com os dados
+    updatePropertyInterface(displayData);
+}
+
+// Adicionar função auxiliar para converter período em nome do mês
+function convertPeriodToMonthName(period) {
+    if (!period) return '';
+    
+    const months = [
+        'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun',
+        'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'
+    ];
+    
+    const parts = period.split('/');
+    if (parts.length === 2) {
+        const monthIndex = parseInt(parts[0]) - 1;
+        if (monthIndex >= 0 && monthIndex < 12) {
+            return `${months[monthIndex]}/${parts[1].slice(-2)}`;
+        }
+    }
+    
+    return period;
+}
+
+function updatePropertyInterface(propertyData) {
     // Atualiza os cards de resumo
     document.getElementById('propertyIncome').textContent = formatCurrency(propertyData.summary.income);
     document.getElementById('propertyExpenses').textContent = formatCurrency(propertyData.summary.expenses);
