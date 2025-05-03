@@ -188,46 +188,78 @@ function importData() {
     }
 }
 
+// Modificação na função parseExcel e parseCSV
 function processDataForImport(data, propertyId) {
     // Mapeia os dados da planilha para o formato do aplicativo
     return data.map(row => {
-        // Obtém o período ou usa um formato padrão
-        const period = row['PERÍODO'] || formatPeriod(row['PERIODO'] || '');
+        // Arrays de possíveis nomes de colunas para cada categoria
+        const periodColumns = ['PERÍODO', 'PERIODO', 'MÊS', 'MES', 'DATA', 'MONTH'];
+        const airbnbColumns = ['AIRBNB', 'RECEITA AIRBNB', 'AIRBNB RECEITA'];
+        const bookingColumns = ['BOOKING', 'RECEITA BOOKING', 'BOOKING RECEITA'];
+        const diretasColumns = ['DIRETAS', 'RECEITA DIRETA', 'RESERVAS DIRETAS'];
+        const receitaColumns = ['RECEITA', 'RECEITA TOTAL', 'TOTAL RECEITAS'];
+        const condominioColumns = ['CONDOMÍNIO', 'CONDOMINIO', 'TAXA CONDOMÍNIO'];
+        const iptuColumns = ['IPTU', 'IPTU + TX LIXO', 'IMPOSTO'];
+        const luzColumns = ['LUZ', 'ENERGIA', 'ELETRICIDADE'];
+        const internetColumns = ['INTERNET', 'WIFI', 'REDE'];
+        const plataformasColumns = ['PLATAFORMAS', 'TAXA PLATAFORMAS', 'COMISSÕES'];
         
-        // Converte valores financeiros (remove R$ e converte vírgula para ponto)
+        // Função para encontrar valor com base nos possíveis nomes de coluna
+        const findValue = (possibleColumns) => {
+            for (let column of possibleColumns) {
+                if (row[column] !== undefined) {
+                    return row[column];
+                }
+            }
+            return 0;
+        };
+        
+        // Função para converter valores, respeitando sinais
         const convertValue = (value) => {
             if (!value) return 0;
             if (typeof value === 'number') return value;
             
-            // Remove R$ e espaços, substitui vírgula por ponto
+            // Remove R$ e espaços, preserva sinal negativo
+            const isNegative = value.toString().includes('-');
             const cleanValue = value.toString()
                 .replace('R$', '')
                 .replace(/\s/g, '')
+                .replace('-', '')
                 .replace('.', '')
                 .replace(',', '.');
             
-            return parseFloat(cleanValue) || 0;
+            const numValue = parseFloat(cleanValue) || 0;
+            return isNegative ? -numValue : numValue;
         };
         
-        // Calcula valores totais
-        const airbnb = convertValue(row['AIRBNB']);
-        const booking = convertValue(row['BOOKING']);
-        const direct = convertValue(row['DIRETAS']);
+        // Obtém valores das colunas
+        const period = formatPeriod(findValue(periodColumns) || '');
         
-        const condominium = convertValue(row['CONDOMÍNIO']);
-        const iptu = convertValue(row['IPTU']);
-        const electricity = convertValue(row['LUZ']);
-        const internet = convertValue(row['INTERNET']);
-        const platforms = convertValue(row['PLATAFORMAS']);
+        // Receitas (sempre positivas)
+        let airbnb = Math.abs(convertValue(findValue(airbnbColumns)));
+        let booking = Math.abs(convertValue(findValue(bookingColumns)));
+        let direct = Math.abs(convertValue(findValue(diretasColumns)));
         
-        // Receita total (se disponível na planilha ou calculado)
-        const totalIncome = convertValue(row['RECEITA']) || (airbnb + booking + direct);
+        // Despesas (sempre negativas)
+        const condominium = -Math.abs(convertValue(findValue(condominioColumns)));
+        const iptu = -Math.abs(convertValue(findValue(iptuColumns)));
+        const electricity = -Math.abs(convertValue(findValue(luzColumns)));
+        const internet = -Math.abs(convertValue(findValue(internetColumns)));
+        const platforms = -Math.abs(convertValue(findValue(plataformasColumns)));
         
-        // Despesas totais (calculado)
+        // Se algum valor vier negativo da planilha, consideramos como despesa
+        if (airbnb < 0) airbnb = 0;
+        if (booking < 0) booking = 0;
+        if (direct < 0) direct = 0;
+        
+        // Receita total
+        const totalIncome = airbnb + booking + direct;
+        
+        // Despesas totais (já são negativas)
         const totalExpenses = condominium + iptu + electricity + internet + platforms;
         
         // Resultado (receita - despesas)
-        const result = totalIncome - totalExpenses;
+        const result = totalIncome + totalExpenses; // Soma pois totalExpenses já é negativo
         
         // Retorna o objeto formatado
         return {
@@ -236,12 +268,12 @@ function processDataForImport(data, propertyId) {
             booking,
             direct,
             totalIncome,
-            condominium,
-            iptu,
-            electricity,
-            internet,
-            platforms,
-            totalExpenses,
+            condominium: Math.abs(condominium), // Armazena valor absoluto
+            iptu: Math.abs(iptu),
+            electricity: Math.abs(electricity),
+            internet: Math.abs(internet),
+            platforms: Math.abs(platforms),
+            totalExpenses: Math.abs(totalExpenses),
             result
         };
     });
