@@ -31,3 +31,25 @@ FlowBnb é uma aplicação web para gerenciar as finanças de apartamentos de al
 ## Desenvolvimento
 
 ### Estrutura do Projeto
+
+index.html (página de login)
+pages/ (páginas da aplicação)
+
+dashboard.html (visão geral)
+property.html (detalhes de propriedade)
+
+
+css/ (estilos)
+js/ (scripts)
+assets/ (recursos como imagens)
+
+### Próximas Funcionalidades
+
+- Calendário de reservas
+- Relatórios personalizados
+- Exportação de dados para Excel
+- Integração com APIs de plataformas de aluguel
+
+## Licença
+
+Este projeto está licenciado sob a licença MIT - veja o arquivo LICENSE para mais detalhes.
