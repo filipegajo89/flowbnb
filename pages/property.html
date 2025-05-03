@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Propriedade - FlowBnb</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/property.css">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar - Mesma estrutura do dashboard -->
+            <div class="col-md-3 col-lg-2 sidebar p-0">
+                <div class="d-flex flex-column p-3">
+                    <a href="#" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+                        <img src="../assets/img/logo.png" alt="FlowBnb Logo" class="logo-small">
+                    </a>
+                    <hr>
+                    <ul class="nav nav-pills flex-column mb-auto">
+                        <li class="nav-item">
+                            <a href="dashboard.html" class="nav-link text-white">
+                                <i class="bi bi-speedometer2 me-2"></i>
+                                Dashboard
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="nav-link text-white" id="property1Link" onclick="loadProperty('property1')">
+                                <i class="bi bi-house me-2"></i>
+                                Apartamento 1
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="nav-link text-white" id="property2Link" onclick="loadProperty('property2')">
+                                <i class="bi bi-house me-2"></i>
+                                Apartamento 2
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="nav-link text-white" id="property3Link" onclick="loadProperty('property3')">
+                                <i class="bi bi-house me-2"></i>
+                                Apartamento 3
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="nav-link text-white" onclick="showReports()">
+                                <i class="bi bi-file-earmark-bar-graph me-2"></i>
+                                Relatórios
+                            </a>
+                        </li>
+                    </ul>
+                    <hr>
+                    <div class="dropdown">
+                        <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-person-circle me-2"></i>
+                            <span id="userName">Usuário</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
+                            <li><a class="dropdown-item" href="#" onclick="logout()">Sair</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main content -->
+            <div class="col-md-9 col-lg-10 main-content">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2" id="propertyTitle">Apartamento</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <button type="button" class="btn btn-sm btn-primary me-2" data-bs-toggle="modal" data-bs-target="#addTransactionModal">
+                            <i class="bi bi-plus-circle me-1"></i> Nova Transação
+                        </button>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="periodDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-calendar"></i>
+                                Período
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="periodDropdown">
+                                <li><a class="dropdown-item" href="#" onclick="changePropertyPeriod('month')">Este Mês</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="changePropertyPeriod('quarter')">Último Trimestre</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="changePropertyPeriod('year')">Este Ano</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="changePropertyPeriod('all')">Todo o Período</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Property Summary Cards -->
+                <div class="row">
+                    <div class="col-md-3 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">Receita</h5>
+                                <h2 class="card-text text-income">R$ <span id="propertyIncome">0,00</span></h2>
+                                <p class="card-text"><small class="text-muted">Últimos 30 dias</small></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-4">
+                        <div class="card h-100">
