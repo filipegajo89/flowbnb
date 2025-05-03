@@ -30,8 +30,15 @@
     cursor: not-allowed;
 }
 
+/* Adicionar regra para conter o gráfico */
+.card .card-body {
+    max-height: 400px;
+    overflow: hidden;
+}
+
 canvas {
     min-height: 250px;
+    max-height: 350px; /* Adicionar altura máxima */
 }
 
 @media (max-width: 767.98px) {
